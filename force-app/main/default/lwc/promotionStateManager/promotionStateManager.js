@@ -1,14 +1,10 @@
-//TODO FOR THE CHALLENGE: Import the module for the State Management
-
+import { defineState } from 'lwc-state';
 const promotionStateManager = defineState(
-  ({ /** TODO FOR THE CHALLENGE: add the required properties here */ }) => {
+  ({ atom, computed, setAtom}) => {
 
-    // TODO FOR THE CHALLENGE: Create a state property of type string to store promotion name
-    const promotionName;
-    
+    const promotionName = atom('');
 
-    // TODO FOR THE CHALLENGE: Create a state property of type array to store products
-    const chosenProducts;
+    const chosenProducts = atom([]);
 
     const chosenStores = atom([]);
 
@@ -21,9 +17,7 @@ const promotionStateManager = defineState(
         } else {
             chosenProductsTemp.push(product);
         }
-        
-        // TODO FOR THE CHALLENGE: set the value of chosenProducts with the chosenProductsTemp
-        
+        setAtom(chosenProducts, chosenProductsTemp);        
     };
 
     // Remove a product by ID
@@ -48,15 +42,14 @@ const promotionStateManager = defineState(
         return product ? product.discountPercent : 0;
     };
 
-    // TODO FOR THE CHALLENGE: Implement the computation logic for the productCount
-    // const productCount;
+    const productCount = computed([chosenProducts], (products) => products.length);
 
     const updateStores = (stores) => {
         setAtom(chosenStores, [...stores]);
     };
 
     const updatePromotionName = (name) => {
-        // TODO FOR THE CHALLENGE: Implement a state change function for updating the product name
+        setAtom(promotionName, name);
     };
 
     // Return an object that defines the public API of promotionStateManager
