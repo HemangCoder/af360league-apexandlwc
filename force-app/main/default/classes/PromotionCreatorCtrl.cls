@@ -1,5 +1,11 @@
+/**
+ * @description       :
+ * @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+ * @group             :
+ * @last modified on  : 12-17-2025
+ * @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+ **/
 public with sharing class PromotionCreatorCtrl {
-
   @AuraEnabled
   public static PagedResult getProducts(
     String type,
@@ -7,32 +13,24 @@ public with sharing class PromotionCreatorCtrl {
     string locatorParam
   ) {
     Integer pageSize = 5;
-    // TODO FOR THE CHALLENGE: 
-    // If the cursor locator is being sent from the parameter, then deserialize the cursor and use the same.
-    // If the locator is NOT sent from the parameter, then create a new cursor.
-    // Create a cursor to get Id, Name,and cgcloud__Category__c from the Product2 object
-    
-    Database.Cursor locator;
+    Database.Cursor locator = (!String.isBlank(locatorParam))
+      ? (Database.Cursor) JSON.deserialize(locatorParam, Database.Cursor.class)
+      : Database.getCursor(
+          'SELECT Id, Name, cgcloud__Category__c FROM Product2 WITH USER_MODE ORDER BY Name'
+        );
 
     integer position = (pageNumber - 1) * pageSize;
-
-    // TODO FOR THE CHALLENGE: 
-    // Define the number of records to be fetched - it is the lesser value either the page size, or the remaining records
-    // integer countToFetch = 
+    Integer countToFetch = Math.min(
+      pageSize,
+      locator.getNumRecords() - position
+    );
 
     PagedResult result = new PagedResult();
     result.pageSize = pageSize;
     result.pageNumber = pageNumber;
-
-    // TODO FOR THE CHALLENGE: Fetch the total number of records, and assign the value
-    // result.totalItemCount = 
-    
-    // TODO FOR THE CHALLENGE: Fetch the records and store it in result.records
-    // result.records = 
-
-    // TODO FOR THE CHALLENGE: send the locator to LWC
-    // result.locator = 
-
+    result.totalItemCount = locator.getNumRecords();
+    result.records = locator.fetch(position, countToFetch);
+    result.locator = JSON.serialize(locator);
     return result;
   }
 
